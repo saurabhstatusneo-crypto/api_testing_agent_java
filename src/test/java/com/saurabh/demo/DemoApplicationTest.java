@@ -1,25 +1,22 @@
 package com.saurabh.demo;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-@ExtendWith(SpringBootTestExtension.class)
 @SpringBootTest
 public class DemoApplicationTests {
 
     @Test
-    void contextLoads() {
-        assertTrue(true);
+    public void testMainMethod() {
+        // Since SpringBoot application is not yet started, we can't directly test it.
+        // However, we can test any class that has been started by SpringBoot and any other class that doesn't rely on SpringBoot
+        // For now, let's just test if the application doesn't throw any exceptions when the main method is called.
+        DemoApplication.main(new String[]{});
     }
 
-    @Test
-    void mainMethodTest() {
-        // Test the main method. Note: Main method can't be directly tested.
-        // We can test the SpringApplication class, but that's not the best approach here
-        // as SpringApplication.run is supposed to be called by spring boot to start the application.
-        // Hence, no assertion here.
-    }
+    // For Spring Boot applications with no public methods (like DemoApplication class), we often have to get creative
+    // with our testing.
+    // For now, since this application doesn't have any public methods to test, we'll keep this test class simple and focus
+    // on testing any external dependencies in a separate test class.
+
 }

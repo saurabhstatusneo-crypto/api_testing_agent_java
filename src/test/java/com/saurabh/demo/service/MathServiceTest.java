@@ -1,65 +1,64 @@
 package com.saurabh.demo.service;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-public class MathServiceTest {
-
+class MathServiceTest {
     @Autowired
     private MathService mathService;
 
+    @InjectMocks
+    private MathService mathServiceMock;
+
     @Test
-    public void givenTwoNumbers_whenMultiply_thenReturnProduct() {
-        int result = mathService.multiply(5, 10);
-        assertEquals(50, result);
+    void testMultiply() {
+        assertEquals(10, mathService.multiply(5, 2));
+        assertEquals(10, mathServiceMock.multiply(5, 2));
     }
 
     @Test
-    public void givenTwoNumbersOneZero_whenDivide_thenReturnIllegalArgumentException() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mathService.divide(5, 0));
+    void testDivide() {
+        double result = mathService.divide(10, 2);
+        assertEquals(5.0, result);
     }
 
     @Test
-    public void givenNumberAndUpTo_whenGenerateTable_thenReturnTable() {
-        String result = mathService.generateTable(5, 10);
-        assertTrue(result.contains("5 x 1 = 5"), "First row is missing");
-        assertTrue(result.contains("5 x 10 = 50"), "Last row is missing");
+    void testDivideByZero() {
+        assertThrows(IllegalArgumentException.class, () -> mathService.divide(10, 0));
+        assertThrows(IllegalArgumentException.class, () -> mathServiceMock.divide(10, 0));
     }
 
     @Test
-    public void givenNumber_whenCountUpTo_thenReturnCount() {
-        String result = mathService.countUpTo(10);
-        assertEquals("1 2 3 4 5 6 7 8 9 10", result);
+    void testGenerateTable() {
+        String result = mathService.generateTable(5, 5);
+        assertEquals("5 x 1 = 5\n5 x 2 = 10\n5 x 3 = 15\n5 x 4 = 20\n5 x 5 = 25", result);
     }
 
     @Test
-    public void givenNoInput_whenHelloworld_thenReturnDefaultString() {
-        String name = mathService.helloworld();
-        assertEquals("hoshiyar", name);
+    void testCountUpTo() {
+        String result = mathService.countUpTo(5);
+        assertEquals("1 2 3 4 5", result);
     }
 
     @Test
-    public void givenInput_whenHelloworld_thenReturnDefaultString() {
-        mathService.helloworld();
-        // No assertions for a side-effect method like println()
+    void testHelloworld() {
+        String result = mathService.helloworld();
+        String name = "hoshiyar";
+        assertEquals(name, result);
     }
 
     @Test
-    public void givenNumber_whenPrintButterfly_thenReturnButterfly() {
+    void testPrintButterfly() {
+        // Note: This test will print to console. If you are running in an IDE, this will only print when the test runs in debug mode.
+        // To test this method, you might need to run your test using a command line or a CI environment.
         mathService.printButterfly(5);
-        // Verify the output directly
-    }
-
-    @Test
-    public void givenMultipleNumbers_whenMultiply_thenReturnProduct() {
-        int result1 = mathService.multiply(5, 10);
-        int result2 = mathService.multiply(10, 20);
-        assertEquals(50, result1);
-        assertEquals(200, result2);
     }
 }
