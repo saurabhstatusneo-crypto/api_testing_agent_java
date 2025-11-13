@@ -1,8 +1,4 @@
 package com.saurabh.demo.controller;
-
-
-
-
 import com.saurabh.demo.service.MathService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +33,6 @@ public class MathController {
     public String count(@RequestParam int n) {
         return mathService.countUpTo(n);
     }
+
 }
 

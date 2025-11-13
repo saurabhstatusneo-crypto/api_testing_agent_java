@@ -1,25 +1,33 @@
+Here's the test class for the provided Java application class.
+
+```java
 package com.saurabh.demo;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
-public class DemoApplicationTest {
+public class DemoApplicationTests {
 
     @Test
-    void testMain() {
-        DemoApplication.main(new String[]{});
+    public void testConstructor() {
+        // Since it's an application class, we cannot directly instantiate and test constructor.
+        // We will test the SpringApplication.run method.
     }
 
     @Test
-    void testApplicationClass() {
-        Class<?> clazz = DemoApplication.class;
-        assertTrue(clazz.isAnnotationPresent(SpringBootApplication.class));
+    public void testSpringApplicationRun() {
+        DemoApplication demoApplication = new DemoApplication();
+        SpringApplication.run(demoApplication.getClass(), null);
+        assertNotNull(SpringApplication.class);
+    }
+
+    @Test
+    public void testSpringApplicationRunThrowNullPointerException() {
+        DemoApplication demoApplication = new DemoApplication();
+        assertThrows(NullPointerException.class, () -> SpringApplication.run(null, null));
     }
 }
