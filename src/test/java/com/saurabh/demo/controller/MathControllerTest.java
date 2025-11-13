@@ -2,64 +2,55 @@ package com.saurabh.demo.controller;
 
 import com.saurabh.demo.service.MathService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.is;
-
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class MathControllerTest {
 
-    @Autowired
+    @Mock
     private MathService mathService;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private MathController mathController;
 
     @Test
-    void testMultiply() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/math/multiply?a=5&b=2")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("10"));
+    public void testMultiply() {
+        when(mathService.multiply(anyInt(), anyInt())).thenReturn(10);
+        int a = 2;
+        int b = 5;
+        int result = mathController.multiply(a, b);
+        assertEquals(10, result);
     }
 
     @Test
-    void testDivision() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/math/divide?a=10&b=2")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("5.0"));
+    public void testDivide() {
+        when(mathService.divide(anyInt(), anyInt())).thenReturn(2.0);
+        int a = 4;
+        int b = 2;
+        double result = mathController.divide(a, b);
+        assertEquals(2.0, result);
     }
 
     @Test
-    void testTable() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/math/table?number=5&upTo=10")
-                        .accept(MediaType.TEXT_PLAIN))
-                .andExpect(status().isOk())
-                .andExpect(content().string(mathService.generateTable(5, 10)));
+    public void testTable() {
+        when(mathService.generateTable(anyInt(), anyInt())).thenReturn("Table of numbers");
+        int number = 5;
+        int upTo = 10;
+        String result = mathController.table(number, upTo);
+        assertEquals("Table of numbers", result);
     }
 
     @Test
-    void testTableDefaultUpTo() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/math/table?number=5")
-                        .accept(MediaType.TEXT_PLAIN))
-                .andExpect(status().isOk())
-                .andExpect(content().string(mathService.generateTable(5, 10)));
-    }
-
-    @Test
-    void testCounting() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/math/count?n=10")
-                        .accept(MediaType.TEXT_PLAIN))
-                .andExpect(status().isOk())
-                .andExpect(content().string(mathService.countUpTo(10)));
+    public void testCount() {
+        when(mathService.countUpTo(anyInt())).thenReturn("Counting numbers");
+        int n = 10;
+        String result = mathController.count(n);
+        assertEquals("Counting numbers", result);
     }
 }

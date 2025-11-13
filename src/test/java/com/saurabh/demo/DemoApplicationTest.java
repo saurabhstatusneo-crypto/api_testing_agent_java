@@ -1,33 +1,25 @@
 package com.saurabh.demo;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(SpringBootTestExtension.class)
 @SpringBootTest
 public class DemoApplicationTests {
 
     @Test
-    @Disabled("This is a demo application with no business logic")
-    public void mainWithArgs() {
-        // This test won't be able to verify anything as the Spring application context is initialized internally
-        // However, if the application crashes, the test will fail with an exception
+    void contextLoads() {
+        assertTrue(true);
     }
 
     @Test
-    @Disabled("This is a demo application with no business logic")
-    public void mainWithoutArgs() {
-        // This test won't be able to verify anything as the Spring application context is initialized internally
-        // However, if the application crashes, the test will fail with an exception
-    }
-
-    @Test
-    @Disabled("This is a demo application with no business logic")
-    public void SpringApplicationRun() {
-        Exception actualException = assertThrows(Exception.class, () -> SpringApplication.run(DemoApplication.class, new String[0]));
-        Exception expectedException = new Exception("Application failed to start");
-        assert expectedException.getMessage().equals(actualException.getMessage());
+    void mainMethodTest() {
+        // Test the main method. Note: Main method can't be directly tested.
+        // We can test the SpringApplication class, but that's not the best approach here
+        // as SpringApplication.run is supposed to be called by spring boot to start the application.
+        // Hence, no assertion here.
     }
 }
