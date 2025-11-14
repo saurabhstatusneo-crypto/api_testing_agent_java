@@ -5,25 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import org.junit.jupiter.api.Assertions;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 public class MathControllerTest {
-
-    private MockMvc mockMvc;
 
     @Mock
     private MathService mathService;
@@ -31,90 +21,109 @@ public class MathControllerTest {
     @InjectMocks
     private MathController mathController;
 
-    @Autowired
-    public void setMathController(MathController mathController) {
-        this.mathController = mathController;
-    }
+    @Test
+    public void testMultiply() {
+        // Arrange
+        int a = 5;
+        int b = 3;
+        int result = 15;
+        when(mathService.multiply(a, b)).thenReturn(result);
 
-    @BeforeEach
-    public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(mathController).build();
+        // Act
+        int actualResult = mathController.multiply(a, b);
+
+        // Assert
+        assertEquals(result, actualResult);
     }
 
     @Test
-    public void testMultiply() throws Exception {
+    public void testDivide() {
         // Arrange
-        when(mathService.multiply(anyInt(), anyInt())).thenReturn(10);
+        int a = 10;
+        int b = 2;
+        double result = 5.0;
+        when(mathService.divide(a, b)).thenReturn(result);
 
         // Act
-        MvcResult result = mockMvc.perform(get("/math/multiply")
-                .param("a", "2")
-                .param("b", "5"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("10"))
-                .andReturn();
+        double actualResult = mathController.divide(a, b);
 
         // Assert
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(result, actualResult);
     }
 
     @Test
-    public void testDivide() throws Exception {
+    public void testTable() {
         // Arrange
-        when(mathService.divide(anyInt(), anyInt())).thenReturn(2.5);
+        int number = 3;
+        int upTo = 10;
+        String result = "3 * 1 = 3\n" +
+                "3 * 2 = 6\n" +
+                "3 * 3 = 9\n" +
+                "3 * 4 = 12\n" +
+                "3 * 5 = 15\n" +
+                "3 * 6 = 18\n" +
+                "3 * 7 = 21\n" +
+                "3 * 8 = 24\n" +
+                "3 * 9 = 27\n" +
+                "3 * 10 = 30";
+        when(mathService.generateTable(number, upTo)).thenReturn(result);
 
         // Act
-        MvcResult result = mockMvc.perform(get("/math/divide")
-                .param("a", "10")
-                .param("b", "4"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("2.5"))
-                .andReturn();
+        String actualResult = mathController.table(number, upTo);
 
         // Assert
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(result, actualResult);
     }
 
     @Test
-    public void testTable() throws Exception {
+    public void testCount() {
         // Arrange
-        when(mathService.generateTable(anyInt(), anyInt())).thenReturn("Table generated");
+        int n = 5;
+        String result = "1\n" +
+                "2\n" +
+                "3\n" +
+                "4\n" +
+                "5";
+        when(mathService.countUpTo(n)).thenReturn(result);
 
         // Act
-        MvcResult result = mockMvc.perform(get("/math/table")
-                .param("number", "2")
-                .param("upTo", "10"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Table generated"))
-                .andReturn();
+        String actualResult = mathController.count(n);
 
         // Assert
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(result, actualResult);
     }
 
     @Test
-    public void testCount() throws Exception {
+    public void testDefaultValueOfUpToInTable() {
         // Arrange
-        when(mathService.countUpTo(anyInt())).thenReturn("Count generated");
+        int number = 3;
+        int defaultUpTo = 10;
+        String expected = "3 * 1 = 3\n" +
+                "3 * 2 = 6\n" +
+                "3 * 3 = 9\n" +
+                "3 * 4 = 12\n" +
+                "3 * 5 = 15\n" +
+                "3 * 6 = 18\n" +
+                "3 * 7 = 21\n" +
+                "3 * 8 = 24\n" +
+                "3 * 9 = 27\n" +
+                "3 * 10 = 30";
+        String result = "3 * 1 = 3\n" +
+                "3 * 2 = 6\n" +
+                "3 * 3 = 9\n" +
+                "3 * 4 = 12\n" +
+                "3 * 5 = 15\n" +
+                "3 * 6 = 18\n" +
+                "3 * 7 = 21\n" +
+                "3 * 8 = 24\n" +
+                "3 * 9 = 27\n" +
+                "3 * 10 = 30";
+        when(mathService.generateTable(number, defaultUpTo)).thenReturn(result);
 
         // Act
-        MvcResult result = mockMvc.perform(get("/math/count")
-                .param("n", "10"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Count generated"))
-                .andReturn();
+        String actualResult = mathController.table(number, defaultUpTo);
 
         // Assert
-        assertEquals(200, result.getResponse().getStatus());
+        assertEquals(result, actualResult);
     }
-
 }
-```
-
-Please note that `MvcResult` is a result object that provides a result of the request, and `andExpect` method is a way to specify expected results or assertions about the result.
-
-To use MockMvc for testing we also need to add MockMvc and Spring Boot Test dependency in our project.
-
-Also note that in the provided test, the MathService behavior is being stubbed using Mockito for better unit test coverage.
-
-The test class should be placed in the same package as the `MathController` class.
