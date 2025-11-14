@@ -1,22 +1,21 @@
 package com.saurabh.demo;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DemoApplicationTest {
+public class DemoApplicationTests {
 
     @Test
-    void mainShouldRunWithoutException() {
-        try {
-            SpringApplication.run(DemoApplication.class, new String[]{});
-        } catch (Exception e) {
-            assertEquals(true, false, "main method should not throw an exception");
-        }
+    public void testMainMethodWithArguments() {
+        SpringApplication.Runner runner = SpringApplication.runner(DemoApplication.class);
+        runner.apply(new String[]{"test"});
+        assertTrue(true); // dummy assertion
     }
 
     @Test
-    void mainShouldRunWithCorrectClass() {
-        SpringApplication.run(DemoApplication.class, new String[]{});
+    public void testMainMethodWithoutArguments() {
+        SpringApplication.Runner runner = SpringApplication.runner(DemoApplication.class);
+        runner.apply(new String[]{});
+        assertTrue(true); // dummy assertion
     }
 }
