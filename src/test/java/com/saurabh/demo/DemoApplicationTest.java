@@ -1,23 +1,22 @@
 package com.saurabh.demo;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import com.saurabh.demo.DemoApplication;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DemoApplicationTest {
 
     @Test
-    public void testMainMethod() {
-        System.out.println("Running testMainMethod...");
-        // Since main method is not designed to be tested,
-        // we will test that the application does not throw an exception.
-        DemoApplication application = new DemoApplication();
+    void mainShouldRunWithoutException() {
         try {
-            application.main(null);
+            SpringApplication.run(DemoApplication.class, new String[]{});
         } catch (Exception e) {
-            assertTrue(false, "Main method failed. See exception: " + e.getMessage());
+            assertEquals(true, false, "main method should not throw an exception");
         }
-        System.out.println("testMainMethod passed");
+    }
+
+    @Test
+    void mainShouldRunWithCorrectClass() {
+        SpringApplication.run(DemoApplication.class, new String[]{});
     }
 }

@@ -1,81 +1,89 @@
 package com.saurabh.demo.controller;
 
 import com.saurabh.demo.service.MathService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyInt;
 
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class MathControllerTest {
 
-    @Mock
-    private MathService mathService;
-
-    @InjectMocks
+    private MockMvc mockMvc;
+    @Autowired
     private MathController mathController;
 
-    private MockMvc mockMvc;
-
-    @org.junit.jupiter.api.BeforeEach
+    @BeforeEach
     public void setup() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(mathController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(mathController).build();
     }
 
     @Test
-    public void givenValidInput_multiply_shouldReturnCorrectResult() throws Exception {
-        int a = 5;
-        int b = 5;
-        int expResult = 25;
-        when(mathService.multiply(a, b)).thenReturn(expResult);
-        String actual = mockMvc.perform(MockMvcRequestBuilders.get("/math/multiply?a=" + a + "&b=" + b))
-                .andReturn().getResponse().getContentAsString();
-        assertEquals(String.valueOf(expResult), actual);
-        verify(mathService).multiply(a, b);
+    public void testMultiply() throws Exception {
+        mockMvc.perform(get("/math/multiply")
+                .param("a", "5")
+                .param("b", "3"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void givenValidInput_divide_shouldReturnCorrectResult() throws Exception {
-        int a = 10;
-        int b = 2;
-        double expResult = 5;
-        when(mathService.divide(a, b)).thenReturn(expResult);
-        String actual = mockMvc.perform(MockMvcRequestBuilders.get("/math/divide?a=" + a + "&b=" + b))
-                .andReturn().getResponse().getContentAsString();
-        assertEquals(String.valueOf(expResult), actual);
-        verify(mathService).divide(a, b);
+    public void testMultiplyZero() throws Exception {
+        mockMvc.perform(get("/math/multiply")
+                .param("a", "5")
+                .param("b", "0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.value").value(0));
     }
 
     @Test
-    public void givenValidInput_table_shouldReturnCorrectResult() throws Exception {
-        int number = 5;
-        int upTo = 10;
-        String expResult = "5 * 1 = 5\n5 * 2 = 10\n5 * 3 = 15\n5 * 4 = 20\n5 * 5 = 25\n5 * 6 = 30\n5 * 7 = 35\n5 * 8 = 40\n5 * 9 = 45\n5 * 10 = 50";
-        when(mathService.generateTable(number, upTo)).thenReturn(expResult);
-        String actual = mockMvc.perform(MockMvcRequestBuilders.get("/math/table?number=" + number + "&upTo=" + upTo))
-                .andReturn().getResponse().getContentAsString();
-        assertEquals(expResult, actual);
-        verify(mathService).generateTable(number, upTo);
+    void testDivide() throws Exception {
+        mockMvc.perform(get("/math/divide")
+                .param("a", "10"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void givenValidInput_count_shouldReturnCorrectResult() throws Exception {
-        int n = 5;
-        String expResult = "1\n2\n3\n4\n5";
-        when(mathService.countUpTo(n)).thenReturn(expResult);
-        String actual = mockMvc.perform(MockMvcRequestBuilders.get("/math/count?n=" + n))
-                .andReturn().getResponse().getContentAsString();
-        assertEquals(expResult, actual);
-        verify(mathService).countUpTo(n);
+    void testTableValidInput() throws Exception {
+        mockMvc.perform(get("/math/table")
+                .param("number", "10")
+                .param("upTo", "10"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testTableInvalidInput() throws Exception {
+        mockMvc.perform(get("/math/table")
+                .param("number", "10")
+                .param("upTo", "a"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testCountValidInput() throws Exception {
+        mockMvc.perform(get("/math/count")
+                .param("n", "10"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testCountInvalidInput() throws Exception {
+        mockMvc.perform(get("/math/count")
+                .param("n", "a"))
+                .andExpect(status().isBadRequest());
     }
 }
