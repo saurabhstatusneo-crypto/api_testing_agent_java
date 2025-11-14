@@ -1,21 +1,23 @@
 package com.saurabh.demo;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
-public class DemoApplicationTests {
+import com.saurabh.demo.DemoApplication;
+
+public class DemoApplicationTest {
 
     @Test
-    public void testMain() {
-        // Since the main method is not testable directly, we can't assert its behavior.
-        // It will throw an exception if anything goes wrong.
+    public void testMainMethod() {
+        System.out.println("Running testMainMethod...");
+        // Since main method is not designed to be tested,
+        // we will test that the application does not throw an exception.
+        DemoApplication application = new DemoApplication();
         try {
-            DemoApplication.main(new String[0]);
+            application.main(null);
         } catch (Exception e) {
-            fail(e.getMessage());
+            assertTrue(false, "Main method failed. See exception: " + e.getMessage());
         }
+        System.out.println("testMainMethod passed");
     }
-
 }
