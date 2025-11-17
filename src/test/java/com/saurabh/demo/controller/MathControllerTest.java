@@ -1,87 +1,49 @@
 package com.saurabh.demo.controller;
 
-import com.saurabh.demo.controller.MathController;
 import com.saurabh.demo.service.MathService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(MathController.class)
 public class MathControllerTest {
 
-    private static final int NUMBER = 5;
-    private static final int FIRST_ARGUMENT = 5;
-    private static final int SECOND_ARGUMENT = 5;
-
-    @Mock
-    private MathService mathService;
-
-    @InjectMocks
-    private MathController mathController;
-
+    @Autowired
     private MockMvc mockMvc;
 
-    public MathControllerTest() {
-        mockMvc = MockMvcBuilders.standaloneSetup(mathController).build();
+    @Autowired
+    private MathController mathController;
+
+    @Test
+    public void testMultiply() throws Exception {
+        // Test multiplication
+        mockMvc.perform(get("/math/multiply?a=5&b=10"))
+                .andExpect(jsonPath("$.result", is(50)));
     }
 
     @Test
-    void testMultiply() throws Exception {
-        when(mathService.multiply(anyInt(), anyInt())).thenReturn(FIRST_ARGUMENT * SECOND_ARGUMENT);
-
-        mockMvc.perform(get("/math/multiply?a=" + FIRST_ARGUMENT + "&b=" + SECOND_ARGUMENT))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("value", is(FIRST_ARGUMENT * SECOND_ARGUMENT)));
+    public void testDivide() throws Exception {
+        // Test division
+        mockMvc.perform(get("/math/divide?a=20&b=4"))
+                .andExpect(jsonPath("$.result", is(5.0)));
     }
 
     @Test
-    void testDivide() throws Exception {
-        when(mathService.divide(anyInt(), anyInt())).thenReturn((double) FIRST_ARGUMENT / SECOND_ARGUMENT);
-
-        mockMvc.perform(get("/math/divide?a=" + FIRST_ARGUMENT + "&b=" + SECOND_ARGUMENT))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("value", is((double) FIRST_ARGUMENT / SECOND_ARGUMENT)));
+    public void testTable() throws Exception {
+        // Test table generator
+        mockMvc.perform(get("/math/table?number=5&upTo=10"))
+                .andExpect(jsonPath("$.table", is("5*0=0\n5*1=5\n5*2=10\n5*3=15\n5*4=20\n5*5=25\n5*6=30\n5*7=35\n5*8=40\n5*9=45\n5*10=50")));
     }
 
     @Test
-    void testTable() throws Exception {
-        String table = "Number\tSquare\tCube" + "\n" +
-                "5\t25\t125";
-
-        when(mathService.generateTable(anyInt(), anyInt())).thenReturn(table);
-
-        mockMvc.perform(get("/math/table?number=" + NUMBER + "&upTo=7"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("value", is(table)));
-    }
-
-    @Test
-    void testCount() throws Exception {
-        String result = "We counted up to 5!" + "\n" +
-                "We are counting numbers" +
-                "We are counting to 5" +
-                "Counting numbers from 1" +
-                "Current count is 3" +
-                "Current count is 4" +
-                "Current count is 5" +
-                "We counted up to 5!";
-
-        when(mathService.countUpTo(anyInt())).thenReturn(result);
-
-        mockMvc.perform(get("/math/count?n=" + NUMBER))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("value", is(result)));
+    public void testCount() throws Exception {
+        // Test counting
+        mockMvc.perform(get("/math/count?n=5"))
+                .andExpect(jsonPath("$.count", is("1, 2, 3, 4, 5")));
     }
 }
