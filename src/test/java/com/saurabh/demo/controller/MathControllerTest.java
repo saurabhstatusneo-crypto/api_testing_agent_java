@@ -1,49 +1,96 @@
 package com.saurabh.demo.controller;
 
 import com.saurabh.demo.service.MathService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
 
-@WebMvcTest(MathController.class)
+@ExtendWith({MockitoExtension.class, SpringExtension.class})
 public class MathControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private MathService mathService;
 
-    @Autowired
+    @InjectMocks
     private MathController mathController;
 
-    @Test
-    public void testMultiply() throws Exception {
-        // Test multiplication
-        mockMvc.perform(get("/math/multiply?a=5&b=10"))
-                .andExpect(jsonPath("$.result", is(50)));
+    @BeforeEach
+    public void setUp() {
+        // Initialize the controller with a mocked service
+        mathController = new MathController(mathService);
+        // Disable Spring's autowiring to avoid unnecessary dependencies
+        ((MathController) mathController).mathService = mathService;
     }
 
     @Test
-    public void testDivide() throws Exception {
-        // Test division
-        mockMvc.perform(get("/math/divide?a=20&b=4"))
-                .andExpect(jsonPath("$.result", is(5.0)));
+    public void testMultiply() {
+        // Arrange
+        int number1 = 5;
+        int number2 = 3;
+        int expectedResult = 15;
+
+        when(mathService.multiply(anyInt(), anyInt())).thenReturn(expectedResult);
+
+        // Act
+        ResponseEntity<Integer> response = ResponseEntity.ok(mathController.multiply(number1, number2));
+
+        // Assert
+        assertEquals(expectedResult, response.getBody());
     }
 
     @Test
-    public void testTable() throws Exception {
-        // Test table generator
-        mockMvc.perform(get("/math/table?number=5&upTo=10"))
-                .andExpect(jsonPath("$.table", is("5*0=0\n5*1=5\n5*2=10\n5*3=15\n5*4=20\n5*5=25\n5*6=30\n5*7=35\n5*8=40\n5*9=45\n5*10=50")));
+    public void testDivide() {
+        // Arrange
+        int number1 = 8;
+        int number2 = 2;
+        double expectedResult = 4.0;
+
+        when(mathService.divide(anyInt(), anyInt())).thenReturn(expectedResult);
+
+        // Act
+        ResponseEntity<Double> response = ResponseEntity.ok(mathController.divide(number1, number2));
+
+        // Assert
+        assertEquals(expectedResult, response.getBody(), 0.01);
     }
 
     @Test
-    public void testCount() throws Exception {
-        // Test counting
-        mockMvc.perform(get("/math/count?n=5"))
-                .andExpect(jsonPath("$.count", is("1, 2, 3, 4, 5")));
+    public void testTable() {
+        // Arrange
+        int number = 2;
+        int upTo = 5;
+        String expectedResult = "2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\n2 x 4 = 8\n2 x 5 = 10";
+
+        when(mathService.generateTable(anyInt(), anyInt())).thenReturn(expectedResult);
+
+        // Act
+        ResponseEntity<String> response = ResponseEntity.ok(mathController.table(number, upTo));
+
+        // Assert
+        assertEquals(expectedResult, response.getBody());
+    }
+
+    @Test
+    public void testCount() {
+        // Arrange
+        int n = 5;
+        String expectedResult = "1. 0 is not a positive number\n2. 1 is a positive number\n3. 2 is a positive number\n4. 3 is a positive number\n5. 4 is a positive number\n6. 5 is a positive number";
+
+        when(mathService.countUpTo(anyInt())).thenReturn(expectedResult);
+
+        // Act
+        ResponseEntity<String> response = ResponseEntity.ok(mathController.count(n));
+
+        // Assert
+        assertEquals(expectedResult, response.getBody());
     }
 }

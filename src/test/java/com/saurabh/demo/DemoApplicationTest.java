@@ -1,17 +1,14 @@
 package com.saurabh.demo;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
-public class DemoApplicationTests {
+public class DemoApplicationTest {
 
     @Test
-    public void testSpringApplicationRun() {
-        // Verify the main function does not throw an exception
-        DemoApplication.main(new String[]{});
-        assertTrue(true);
+    public void testMain() {
+        // Spring Boot tests require a runner to launch the application context
+        System.getProperty("spring.main.web-application-type", "");
+        System.exit(SpringApplication.exit(SpringApplication.run(DemoApplication.class)));
     }
-
 }
