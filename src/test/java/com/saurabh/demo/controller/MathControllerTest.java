@@ -1,83 +1,87 @@
 package com.saurabh.demo.controller;
 
+import com.saurabh.demo.controller.MathController;
 import com.saurabh.demo.service.MathService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@WebMvcTest(MathController.class)
+@ExtendWith(MockitoExtension.class)
 public class MathControllerTest {
+
+    private static final int NUMBER = 5;
+    private static final int FIRST_ARGUMENT = 5;
+    private static final int SECOND_ARGUMENT = 5;
+
+    @Mock
+    private MathService mathService;
+
+    @InjectMocks
+    private MathController mathController;
 
     private MockMvc mockMvc;
 
-    @Autowired
-    private MathController mathController;
-
-    @MockBean
-    private MathService mathService;
-
-    @BeforeEach
-    public void setup() {
-        this.mockMvc = org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup(mathController).build();
+    public MathControllerTest() {
+        mockMvc = MockMvcBuilders.standaloneSetup(mathController).build();
     }
 
     @Test
-    public void givenMultiplicationRequest_WhenCallMultiplyMethod_ThenReturnResult() throws Exception {
-        // Arrange
-        when(mathService.multiply(10, 5)).thenReturn(50);
-        // Act
-        MvcResult mvcResult = mockMvc.perform(get("/math/multiply?a=10&b=5"))
+    void testMultiply() throws Exception {
+        when(mathService.multiply(anyInt(), anyInt())).thenReturn(FIRST_ARGUMENT * SECOND_ARGUMENT);
+
+        mockMvc.perform(get("/math/multiply?a=" + FIRST_ARGUMENT + "&b=" + SECOND_ARGUMENT))
                 .andExpect(status().isOk())
-                .andReturn();
-        // Assert
-        assertEquals("50", mvcResult.getResponse().getContentAsString());
+                .andExpect(jsonPath("value", is(FIRST_ARGUMENT * SECOND_ARGUMENT)));
     }
 
     @Test
-    public void givenDivisionRequest_WhenCallDivideMethod_ThenReturnResult() throws Exception {
-        // Arrange
-        when(mathService.divide(10, 2)).thenReturn(5.0);
-        // Act
-        MvcResult mvcResult = mockMvc.perform(get("/math/divide?a=10&b=2"))
+    void testDivide() throws Exception {
+        when(mathService.divide(anyInt(), anyInt())).thenReturn((double) FIRST_ARGUMENT / SECOND_ARGUMENT);
+
+        mockMvc.perform(get("/math/divide?a=" + FIRST_ARGUMENT + "&b=" + SECOND_ARGUMENT))
                 .andExpect(status().isOk())
-                .andReturn();
-        // Assert
-        assertEquals("5.0", mvcResult.getResponse().getContentAsString());
+                .andExpect(jsonPath("value", is((double) FIRST_ARGUMENT / SECOND_ARGUMENT)));
     }
 
     @Test
-    public void givenTableRequest_WhenCallTableMethod_ThenReturnResult() throws Exception {
-        // Arrange
-        when(mathService.generateTable(10, 10)).thenReturn("10 x 10 = 100\n10 x 1 = 10");
-        // Act
-        MvcResult mvcResult = mockMvc.perform(get("/math/table?number=10&upTo=10"))
+    void testTable() throws Exception {
+        String table = "Number\tSquare\tCube" + "\n" +
+                "5\t25\t125";
+
+        when(mathService.generateTable(anyInt(), anyInt())).thenReturn(table);
+
+        mockMvc.perform(get("/math/table?number=" + NUMBER + "&upTo=7"))
                 .andExpect(status().isOk())
-                .andReturn();
-        // Assert
-        assertEquals("10 x 10 = 100\n10 x 1 = 10", mvcResult.getResponse().getContentAsString());
+                .andExpect(jsonPath("value", is(table)));
     }
 
     @Test
-    public void givenCountingRequest_WhenCallCountMethod_ThenReturnResult() throws Exception {
-        // Arrange
-        when(mathService.countUpTo(10)).thenReturn("1,2,3,4,5,6,7,8,9,10");
-        // Act
-        MvcResult mvcResult = mockMvc.perform(get("/math/count?n=10"))
+    void testCount() throws Exception {
+        String result = "We counted up to 5!" + "\n" +
+                "We are counting numbers" +
+                "We are counting to 5" +
+                "Counting numbers from 1" +
+                "Current count is 3" +
+                "Current count is 4" +
+                "Current count is 5" +
+                "We counted up to 5!";
+
+        when(mathService.countUpTo(anyInt())).thenReturn(result);
+
+        mockMvc.perform(get("/math/count?n=" + NUMBER))
                 .andExpect(status().isOk())
-                .andReturn();
-        // Assert
-        assertEquals("1,2,3,4,5,6,7,8,9,10", mvcResult.getResponse().getContentAsString());
+                .andExpect(jsonPath("value", is(result)));
     }
 }

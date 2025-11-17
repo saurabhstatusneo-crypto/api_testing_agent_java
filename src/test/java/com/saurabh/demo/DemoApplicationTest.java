@@ -1,25 +1,32 @@
 package com.saurabh.demo;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(SpringBootTestExtension.class)
 @SpringBootTest
 public class DemoApplicationTests {
 
     @Test
-    public void testMain() {
-        // This test will fail unless the application is run and terminated manually
-        // to capture its exit status.
-        // System.out.println("Exit Code: " + DemoApplication.main(new String[] {}));
-        // This method is not directly unit-testable due to its static call to run.
-        // Therefore, this test is more of an integration test rather than a unit test.
+    public void testSpringApplicationRun() {
+        SpringApplication.run(DemoApplication.class, new String[0]);
+        // As the main method of the DemoApplication class is public static void main(String[] args),
+        // there's no way to test it directly. But we can verify that it runs successfully.
     }
 
     @Test
-    public void testSpringApplicationRun() {
-        // This test case is designed to test that the application is successfully launched.
-        SpringApplication.run(DemoApplication.class, new String[]{});
+    public void testMainMethodNoArgs() {
+        assertThrows(Exception.class, () -> SpringApplication.run(DemoApplication.class, null));
+    }
+
+    @Test
+    public void testMainMethodSingleArg() {
+        assertThrows(Exception.class, () -> SpringApplication.run(DemoApplication.class, new String[] {"Single Arg"}));
+    }
+
+    @Test
+    public void testMainMethodMultipleArgs() {
+        assertThrows(Exception.class, () -> SpringApplication.run(DemoApplication.class, new String[] {"Arg1", "Arg2", "Arg3"}));
     }
 }

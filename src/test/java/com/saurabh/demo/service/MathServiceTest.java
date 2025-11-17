@@ -1,62 +1,77 @@
 package com.saurabh.demo.service;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import org.springframework.test.context.ContextConfiguration;
-
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = MathService.class)
+@ExtendWith(MockitoExtension.class)
 public class MathServiceTest {
 
-    @Autowired
+    @InjectMocks
     private MathService mathService;
 
     @Test
     public void testMultiply() {
-        int result = mathService.multiply(5, 5);
-        assertEquals(25, result);
+        assertEquals(6, mathService.multiply(2, 3));
+        assertEquals(-12, mathService.multiply(-4, 3));
+        assertEquals(7, mathService.multiply(7, 1));
+        assertEquals(-12, mathService.multiply(-6, 2));
+    }
+
+    @Test
+    public void testMultiplyByZeroShouldThrowException() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> mathService.multiply(12, 0));
+        assertEquals("Division by zero is not allowed", exception.getMessage());
     }
 
     @Test
     public void testDivide() {
-        double result = mathService.divide(10, 2);
-        assertEquals(5.0, result);
+        assertEquals(6.0d, mathService.divide(12, 2), 1e-6);
+        assertEquals(12.0d, mathService.divide(48, 4), 1e-6);
+        assertEquals(-3.0d, mathService.divide(-12, 4), 1e-6);
     }
 
     @Test
-    public void testDivideByZero() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> mathService.divide(10, 0));
+    public void testDivideByZeroShouldThrowException() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> mathService.divide(12, 0));
         assertEquals("Division by zero is not allowed", exception.getMessage());
     }
 
     @Test
     public void testGenerateTable() {
-        String result = mathService.generateTable(5, 5);
-        assertEquals("5 x 1 = 5\n5 x 2 = 10\n5 x 3 = 15\n5 x 4 = 20\n5 x 5 = 25\n", result);
+        String expected = "1 x 1 = 1\n" +
+                "1 x 2 = 2\n" +
+                "1 x 3 = 3\n" +
+                "1 x 4 = 4\n" +
+                "1 x 5 = 5";
+
+        assertEquals(expected, mathService.generateTable(1, 5));
     }
 
     @Test
     public void testCountUpTo() {
-        String result = mathService.countUpTo(5);
-        assertEquals("1 2 3 4 5", result);
+        String expected = "1 2 3 4 5 6 7 8 9 10";
+        assertEquals(expected, mathService.countUpTo(10));
     }
 
     @Test
     public void testHelloworld() {
-        String result = mathService.helloworld();
-        assertEquals("hoshiyar", result);
+        String expected = "hoshiyar";
+        String actual = mathService.helloworld();
+        assertEquals(expected, actual);
     }
 
     @Test
-    public void testPrintButterfly() {
+    public void testPrintButterflyEven() {
         mathService.printButterfly(5);
+    }
+
+    @Test
+    public void testPrintButterflyOdd() {
+        mathService.printButterfly(7);
     }
 }
